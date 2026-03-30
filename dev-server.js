@@ -56,6 +56,9 @@ function createApiResponse(res) {
 }
 
 function resolveStaticPath(urlPathname) {
+    if (urlPathname === '/favicon.ico') {
+        return path.join(rootDir, 'public', 'favicon.ico');
+    }
     const safePath = path.normalize(urlPathname).replace(/^(\.\.(\/|\\|$))+/, '');
     let filePath = path.join(rootDir, safePath);
     if (urlPathname === '/' || urlPathname === '') {

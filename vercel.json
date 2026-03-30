@@ -6,6 +6,14 @@
   },
   "rewrites": [
     {
+      "source": "/favicon.ico",
+      "destination": "/public/favicon.ico"
+    },
+    {
+      "source": "/public/:path*",
+      "destination": "/public/:path*"
+    },
+    {
       "source": "/result",
       "destination": "/result/index.html"
     },
