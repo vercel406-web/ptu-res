@@ -1,0 +1,15 @@
+{
+  "name": "ptu-result-portal",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "dev": "node dev-server.js",
+    "check": "node --check api/_db.js && node --check api/admin/login.js && node --check api/results/get.js && node --check api/results/upsert.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "mysql2": "^3.14.1",
+    "pg": "^8.16.3"
+  }
+}

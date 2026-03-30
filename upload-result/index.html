@@ -1,0 +1,123 @@
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Upload Result | IKGPTU</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet"
+        href="https://ptu.ac.in/wp-content/themes/cynic/css/classic-modern-agency/bootstrap.css?ver=6.9.4">
+    <link rel="stylesheet"
+        href="https://ptu.ac.in/wp-content/themes/cynic/css/classic-modern-agency/font-awesome.min.css?ver=6.9.4">
+</head>
+<body class="wp-theme-cynic wp-child-theme-cynic-child">
+    <nav class="navbar main-menu" style="margin-bottom:0;">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">IKGPTU</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/">Home</a></li>
+                <li><a href="/result">Result</a></li>
+                <li><a href="/admin-login">Admin Login</a></li>
+                <li><a href="/upload-result">Upload Result</a></li>
+            </ul>
+        </div>
+    </nav>
+    <section style="padding:60px 0;background:#f7f9fc;min-height:calc(100vh - 50px);">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Upload Result</h3>
+                        </div>
+                        <div class="panel-body">
+                            <form id="uploadForm" action="#" method="post">
+                                <div class="form-group">
+                                    <label for="rollNumber">Roll Number</label>
+                                    <input id="rollNumber" name="rollNumber" type="text" class="form-control"
+                                        placeholder="Enter Roll Number" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="resultYear">Year</label>
+                                    <input id="resultYear" name="resultYear" type="number" class="form-control"
+                                        placeholder="Example: 2026" min="1997" max="2100" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="resultPdf">Result PDF File</label>
+                                    <input id="resultPdf" name="resultPdf" type="file" class="form-control" accept="application/pdf" required>
+                                </div>
+                                <button type="submit" class="btn btn-success">Save Result</button>
+                            </form>
+                            <div id="uploadMessage" style="margin-top:12px;font-weight:600;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        (function () {
+            var username = sessionStorage.getItem('admin_username');
+            var password = sessionStorage.getItem('admin_password');
+            if (!username || !password) {
+                window.location.href = '/admin-login';
+                return;
+            }
+            var form = document.getElementById('uploadForm');
+            var message = document.getElementById('uploadMessage');
+            form.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                message.style.color = '#0f172a';
+                message.textContent = 'Saving...';
+                var rollNumber = document.getElementById('rollNumber').value.trim();
+                var resultYear = document.getElementById('resultYear').value.trim();
+                var pdfFile = document.getElementById('resultPdf').files[0];
+                if (!pdfFile) {
+                    message.style.color = '#b91c1c';
+                    message.textContent = 'Please choose a PDF file';
+                    return;
+                }
+                if (pdfFile.type !== 'application/pdf') {
+                    message.style.color = '#b91c1c';
+                    message.textContent = 'Only PDF files are allowed';
+                    return;
+                }
+                try {
+                    var pdfDataUrl = await new Promise(function (resolve, reject) {
+                        var reader = new FileReader();
+                        reader.onload = function () { resolve(reader.result); };
+                        reader.onerror = function () { reject(new Error('Unable to read PDF file')); };
+                        reader.readAsDataURL(pdfFile);
+                    });
+                    var payload = {
+                        username: username,
+                        password: password,
+                        rollNumber: rollNumber,
+                        studentName: rollNumber,
+                        session: resultYear,
+                        pdfUrl: pdfDataUrl
+                    };
+                    var response = await fetch('/api/results/upsert', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    var data = await response.json();
+                    if (!response.ok || !data.ok) {
+                        message.style.color = '#b91c1c';
+                        message.textContent = data.message || 'Unable to save result';
+                        return;
+                    }
+                    message.style.color = '#166534';
+                    message.textContent = 'Result saved successfully';
+                    form.reset();
+                } catch (error) {
+                    message.style.color = '#b91c1c';
+                    message.textContent = 'Upload request failed';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Result | IKGPTU</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet"
+        href="https://ptu.ac.in/wp-content/themes/cynic/css/classic-modern-agency/bootstrap.css?ver=6.9.4">
+    <link rel="stylesheet"
+        href="https://ptu.ac.in/wp-content/themes/cynic/css/classic-modern-agency/font-awesome.min.css?ver=6.9.4">
+</head>
+<body class="wp-theme-cynic wp-child-theme-cynic-child">
+    <nav class="navbar main-menu" style="margin-bottom:0;">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">IKGPTU</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/">Home</a></li>
+                <li><a href="/result">Result</a></li>
+                <li><a href="/admin-login">Admin Login</a></li>
+                <li><a href="/upload-result">Upload Result</a></li>
+            </ul>
+        </div>
+    </nav>
+    <section style="padding:20px 0 40px;background:#2ebdb1;min-height:calc(100vh - 50px);">
+        <div class="container" style="max-width:980px;">
+            <div style="text-align:center;background:#c8e7ff;padding:18px 10px 10px;margin-bottom:14px;">
+                <h2 style="margin:0;font-weight:700;color:#000;">Result Examination Portal</h2>
+                <p style="margin:2px 0 0;font-weight:600;color:#000;">Punjab Technical University</p>
+            </div>
+            <div style="text-align:center;margin-bottom:14px;">
+                <form id="resultForm" action="#" method="post" style="display:inline-block;">
+                    <label for="rollNo" style="margin-right:8px;font-weight:700;">Roll Number :</label>
+                    <input id="rollNo" name="rollNo" type="text" style="width:140px;height:30px;" required>
+                    <label for="resultYear" style="margin:0 8px 0 14px;font-weight:700;">Year :</label>
+                    <input id="resultYear" name="resultYear" type="number" min="1997" max="2100" style="width:100px;height:30px;" required>
+                    <button type="submit" class="btn btn-default btn-sm" style="margin-left:10px;">Submit</button>
+                </form>
+                <div id="resultMessage" style="margin-top:10px;font-weight:700;color:#000;"></div>
+            </div>
+            <div id="resultCard" style="display:none;background:#fff;padding:12px;">
+                <div style="margin-bottom:8px;font-weight:700;">Roll Number: <span id="rRoll"></span> | Year: <span id="rSession"></span></div>
+                <iframe id="resultPdfFrame" title="Result PDF Preview" style="width:100%;height:950px;border:1px solid #ddd;"></iframe>
+            </div>
+        </div>
+    </section>
+    <script>
+        document.getElementById('resultForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            var rollNo = document.getElementById('rollNo').value.trim();
+            var message = document.getElementById('resultMessage');
+            var card = document.getElementById('resultCard');
+            card.style.display = 'none';
+            message.style.color = '#0f172a';
+            message.textContent = 'Loading...';
+            try {
+                var year = document.getElementById('resultYear').value.trim();
+                var response = await fetch('/api/results/get?rollNumber=' + encodeURIComponent(rollNo) + '&year=' + encodeURIComponent(year));
+                var data = await response.json();
+                if (!response.ok || !data.ok) {
+                    message.style.color = '#b91c1c';
+                    message.textContent = data.message || 'Result not found';
+                    return;
+                }
+                var result = data.result;
+                document.getElementById('rRoll').textContent = result.rollNumber || '-';
+                document.getElementById('rSession').textContent = result.session || '-';
+                document.getElementById('resultPdfFrame').src = result.pdfUrl || '';
+                card.style.display = 'block';
+                message.style.color = '#166534';
+                message.textContent = 'Result found';
+            } catch (error) {
+                message.style.color = '#b91c1c';
+                message.textContent = 'Unable to fetch result';
+            }
+        });
+    </script>
+</body>
+</html>
