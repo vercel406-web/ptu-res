@@ -277,7 +277,7 @@
                             navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span
                             class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="https://ptu.ac.in/">
+                    <a class="navbar-brand" href="/">
                         <img src="https://ptu.ac.in/wp-content/themes/cynic/images/classic-logo.png"
                             alt="I.K. Gujral Punjab Technical University Jalandhar – Punjab">
                     </a>
@@ -338,7 +338,7 @@
                 <div class="collapse navbar-collapse sticky-element-original element-is-sticky" id="navbar-collapse-1"
                     style="margin-top: 0px !important; margin-left: 0px !important; position: fixed; left: 0px; top: 0px; width: 1507px; padding: 0px 15px; z-index: 1;">
                     <ul id="menu-website-main-menu" class="nav navbar-nav navbar-right">
-                        <li class="pt-h active meg-nav-menu-ptu.ac.in"><a href="https://ptu.ac.in/"><i
+                        <li class="pt-h active meg-nav-menu-ptu.ac.in"><a href="/"><i
                                     style="font-size:1em;color:#ffffff"
                                     class="wpmi-icon wpmi-label-1 wpmi-position-before wpmi-align-middle wpmi-size-1 dashicons dashicons-admin-home"></i></a>
                         </li>
@@ -3926,6 +3926,15 @@
                 }
             }
         );
+        var allowedHeaderLinks = ["/", "/result/", "/result", "/admin-login/", "/admin-login", "/upload-result/", "/upload-result"];
+        document.querySelectorAll("#menu-website-main-menu a").forEach(function (anchor) {
+            var href = anchor.getAttribute("href") || "";
+            if (allowedHeaderLinks.indexOf(href) === -1) {
+                anchor.addEventListener("click", function (event) {
+                    event.preventDefault();
+                });
+            }
+        });
         /* ]]> */
     </script>
     <script type="text/javascript" defer="defer"
