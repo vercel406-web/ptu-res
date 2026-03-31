@@ -1572,6 +1572,9 @@
                 font-size: 12px !important;
                 line-height: 15px !important;
             }
+            .navbar-header {
+                margin-top: 50px;
+            }
 
             /*.navbar-header {  height: 92px; }*/
             /*	
