@@ -1,4 +1,5 @@
 <html lang="en-US">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,6 +11,7 @@
     <link rel="stylesheet"
         href="https://ptu.ac.in/wp-content/themes/cynic/css/classic-modern-agency/font-awesome.min.css?ver=6.9.4">
 </head>
+
 <body class="wp-theme-cynic wp-child-theme-cynic-child">
     <nav class="navbar main-menu" style="margin-bottom:0;">
         <div class="container">
@@ -45,8 +47,21 @@
                                         placeholder="Example: 2026" min="1997" max="2100" required>
                                 </div>
                                 <div class="form-group">
+                                    <label for="resultSemester">Semester</label>
+                                    <select id="resultSemester" name="resultSemester" class="form-control">
+                                        <option value="">Select Semester</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label for="resultPdf">Result PDF File</label>
-                                    <input id="resultPdf" name="resultPdf" type="file" class="form-control" accept="application/pdf" required>
+                                    <input id="resultPdf" name="resultPdf" type="file" class="form-control"
+                                        accept="application/pdf" required>
                                 </div>
                                 <button type="submit" class="btn btn-success">Save Result</button>
                             </form>
@@ -73,6 +88,7 @@
                 message.textContent = 'Saving...';
                 var rollNumber = document.getElementById('rollNumber').value.trim();
                 var resultYear = document.getElementById('resultYear').value.trim();
+                var resultSemester = document.getElementById('resultSemester').value;
                 var pdfFile = document.getElementById('resultPdf').files[0];
                 if (!pdfFile) {
                     message.style.color = '#b91c1c';
@@ -97,6 +113,7 @@
                         rollNumber: rollNumber,
                         studentName: rollNumber,
                         session: resultYear,
+                        semester: resultSemester,
                         pdfUrl: pdfDataUrl
                     };
                     var response = await fetch('/api/results/upsert', {
@@ -121,4 +138,5 @@
         })();
     </script>
 </body>
+
 </html>

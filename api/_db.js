@@ -136,9 +136,10 @@ async function upsertResult(data) {
     }
 }
 
-async function getResultByRollNumber(rollNumber, year) {
+async function getResultByRollNumber(rollNumber, year, semester) {
     const key = String(rollNumber || '').trim();
     const yearValue = String(year || '').trim();
+    const semesterValue = String(semester || '').trim();
     if (!key) {
         throw new Error('rollNumber is required');
     }
@@ -148,13 +149,29 @@ async function getResultByRollNumber(rollNumber, year) {
     if (provider === 'mysql') {
         const pool = getMysqlPool();
         let rows;
-        if (yearValue) {
+        if (yearValue && semesterValue) {
+            [rows] = await pool.query(
+                `SELECT roll_number, student_name, course_name, semester, exam_session, result_status, marks_json, pdf_url, updated_at
+                 FROM student_results
+                 WHERE roll_number = ? AND exam_session = ? AND semester = ?
+                 LIMIT 1`,
+                [key, yearValue, semesterValue]
+            );
+        } else if (yearValue) {
             [rows] = await pool.query(
                 `SELECT roll_number, student_name, course_name, semester, exam_session, result_status, marks_json, pdf_url, updated_at
                  FROM student_results
                  WHERE roll_number = ? AND exam_session = ?
                  LIMIT 1`,
                 [key, yearValue]
+            );
+        } else if (semesterValue) {
+            [rows] = await pool.query(
+                `SELECT roll_number, student_name, course_name, semester, exam_session, result_status, marks_json, pdf_url, updated_at
+                 FROM student_results
+                 WHERE roll_number = ? AND semester = ?
+                 LIMIT 1`,
+                [key, semesterValue]
             );
         } else {
             [rows] = await pool.query(
@@ -170,13 +187,29 @@ async function getResultByRollNumber(rollNumber, year) {
 
     const pool = getPgPool();
     let result;
-    if (yearValue) {
+    if (yearValue && semesterValue) {
+        result = await pool.query(
+            `SELECT roll_number, student_name, course_name, semester, exam_session, result_status, marks_json, pdf_url, updated_at
+             FROM student_results
+             WHERE roll_number = $1 AND exam_session = $2 AND semester = $3
+             LIMIT 1`,
+            [key, yearValue, semesterValue]
+        );
+    } else if (yearValue) {
         result = await pool.query(
             `SELECT roll_number, student_name, course_name, semester, exam_session, result_status, marks_json, pdf_url, updated_at
              FROM student_results
              WHERE roll_number = $1 AND exam_session = $2
              LIMIT 1`,
             [key, yearValue]
+        );
+    } else if (semesterValue) {
+        result = await pool.query(
+            `SELECT roll_number, student_name, course_name, semester, exam_session, result_status, marks_json, pdf_url, updated_at
+             FROM student_results
+             WHERE roll_number = $1 AND semester = $2
+             LIMIT 1`,
+            [key, semesterValue]
         );
     } else {
         result = await pool.query(
