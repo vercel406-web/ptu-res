@@ -9,7 +9,8 @@ module.exports = async function handler(req, res) {
     try {
         const rollNumber = req.query?.rollNumber || req.query?.rollNo || '';
         const year = req.query?.year || req.query?.resultYear || '';
-        const result = await getResultByRollNumber(rollNumber, year);
+        const semester = req.query?.semester || '';
+        const result = await getResultByRollNumber(rollNumber, year, semester);
         if (!result) {
             res.status(404).json({ ok: false, message: 'Result not found' });
             return;
